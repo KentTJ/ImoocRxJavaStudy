@@ -22,6 +22,12 @@ public class Caller<T> {
         return receiver;
     }
 
+    /**
+     * 1、当打电话时会调用此接口；
+     * 2、作用于Caller，向接电话的人发送通话内容。
+     *
+     * @param <T>
+     */
     public interface OnCall<T> extends Action1<Receiver<T>> {
 
     }
