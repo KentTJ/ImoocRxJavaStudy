@@ -10,27 +10,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-        </activity>
-
-        <activity android:name=".chapter3.lesson1.Lesson3_1Activity">
-            <!--<intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-        </activity>
-        <activity android:name=".chapter3.lesson5.Lesson3_5Activity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".chapter3.lesson1.Lesson3_1Activity"></activity>
+        <activity android:name=".chapter3.lesson5.Lesson3_5Activity"></activity>
+        <activity android:name=".chapter3.lesson5.Lesson3_6_ImidateRx2Activity" />
     </application>
 
 </manifest>
