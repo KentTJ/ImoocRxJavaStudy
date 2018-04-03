@@ -74,7 +74,16 @@ public class Lesson3_1Activity extends AppCompatActivity {
                     @Override
                     public void subscribe(ObservableEmitter<String> e) throws Exception {
                         if (!e.isDisposed()) {
-                            e.onNext("test");
+                            e.onNext("1");
+                            e.onNext("2");
+                            e.onNext("3");
+                            e.onNext("4");
+                            e.onNext("5");
+                            e.onNext("6");
+                            e.onNext("7");
+                            e.onNext("8");
+                            e.onNext("9");
+                            e.onNext("10");
                             e.onComplete();
                         }
                     }
