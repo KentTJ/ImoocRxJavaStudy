@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, Lesson3_5Activity.class));
     }
 
-    public void rx2_imitate_no_backpress(View view) {
+    public void rx2_imitate(View view) {
         startActivity(new Intent(this, Lesson3_6_ImidateRx2Activity.class));
     }
 }

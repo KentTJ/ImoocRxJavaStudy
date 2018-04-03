@@ -11,6 +11,11 @@ import com.nicro.async.imitate2.Caller;
 import com.nicro.async.imitate2.CallerEmitter;
 import com.nicro.async.imitate2.CallerOnCall;
 import com.nicro.async.imitate2.Release;
+import com.nicro.async.imitate2.backpressure.Drop;
+import com.nicro.async.imitate2.backpressure.Receiver;
+import com.nicro.async.imitate2.backpressure.Telephoner;
+import com.nicro.async.imitate2.backpressure.TelephonerEmitter;
+import com.nicro.async.imitate2.backpressure.TelephonerOnCall;
 import com.nicro.imoocrxjavastudy.R;
 
 /**
@@ -56,6 +61,38 @@ public class Lesson3_6_ImidateRx2Activity extends AppCompatActivity {
 
                     }
                 });
+            }
+        });
+    }
+
+    public void rx2_imitate_with_backpresure(View view) {
+        Telephoner.create(new TelephonerOnCall<String>() {
+            @Override
+            public void call(TelephonerEmitter<String> telephonerEmitter) {
+                telephonerEmitter.onReceive("test");
+                telephonerEmitter.onCompleted();
+
+            }
+        }).call(new Receiver<String>() {
+            @Override
+            public void onCall(Drop d) {
+                d.request(1);
+                Log.d(TAG, "onCall");
+            }
+
+            @Override
+            public void onReceiver(String s) {
+                Log.d(TAG, "onReceiver " + s);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                Log.d(TAG, "onCompleted");
             }
         });
     }
