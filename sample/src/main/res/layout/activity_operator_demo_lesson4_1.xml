@@ -2,30 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical">
 
     <Button
+        android:id="@+id/btnRxJava1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="demo_rx1_rx2"
-        android:text="demoRx1rx2" />
+        android:layout_centerHorizontal="true"
+        android:onClick="demo_rxJava1"
+        android:text="RxJava1" />
+
+    <Button
+        android:id="@+id/btnRxJava2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="RxJava2" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="rx1_imitate"
-        android:text="rx1_imitate" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="rx2_imitate"
-        android:text="rx2_imitate" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="chapter4"
-        android:text="chapter4_opoerator" />
+        android:layout_centerHorizontal="true"
+        android:onClick="imitate_RxJava1_operator"
+        android:text="RxJava1_imidate_operator" />
 
 </LinearLayout>

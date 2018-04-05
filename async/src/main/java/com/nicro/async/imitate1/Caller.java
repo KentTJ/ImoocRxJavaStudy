@@ -32,4 +32,24 @@ public class Caller<T> {
 
     }
 
+    /**
+     * 1、Operator接口是操作符的抽象接口；
+     * 2、各操作符实现Operator接口，用于处理具体的变换
+     *
+     * @param <R>
+     * @param <T>
+     */
+    public interface Operator<R, T> extends Func1<Receiver<R>, Receiver<T>> {
+
+    }
+
+    public <R> Caller<R> lift(final Operator<R, T> operator) {
+        return create(new OnCallLift<T, R>(onCall, operator));
+    }
+
+    public final <R> Caller<R> map(Func1<T, R> func) {
+        return lift(new MapOperator<T, R>(func));
+    }
+
+
 }

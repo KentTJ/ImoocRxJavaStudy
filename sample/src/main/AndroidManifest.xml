@@ -20,6 +20,7 @@
         <activity android:name=".chapter3.lesson1.Lesson3_1Activity"></activity>
         <activity android:name=".chapter3.lesson5.Lesson3_5Activity"></activity>
         <activity android:name=".chapter3.lesson5.Lesson3_6_ImidateRx2Activity" />
+        <activity android:name=".chapter4.lesson1.OperatorDemo" />
     </application>
 
 </manifest>

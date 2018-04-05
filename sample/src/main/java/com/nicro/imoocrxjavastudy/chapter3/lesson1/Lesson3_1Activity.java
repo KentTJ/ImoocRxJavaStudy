@@ -3,23 +3,9 @@ package com.nicro.imoocrxjavastudy.chapter3.lesson1;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 
 import com.nicro.imoocrxjavastudy.R;
-
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 
 /**
@@ -69,7 +55,7 @@ public class Lesson3_1Activity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //完全不处理背压问题的 Observable
-                Observable.create(new ObservableOnSubscribe<String>() {
+               /* Observable.create(new ObservableOnSubscribe<String>() {
                     //Emitter 发射器
                     @Override
                     public void subscribe(ObservableEmitter<String> e) throws Exception {
@@ -139,7 +125,7 @@ public class Lesson3_1Activity extends AppCompatActivity {
                     public void onComplete() {
                         Log.d(TAG, "Flowable onCompleted");
                     }
-                });
+                });*/
 
             }//end onClick
 
