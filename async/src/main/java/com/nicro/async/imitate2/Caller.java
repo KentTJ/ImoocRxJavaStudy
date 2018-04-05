@@ -20,4 +20,8 @@ public abstract class Caller<T> {
     public <R> Caller<R> map(Function<T, R> function) {
         return new CallerMap<>(this, function);
     }
+
+    public <R> Caller<R> lift(CallerOperator<R,T> operator){
+        return new CallerLift<>(this,operator);
+    }
 }

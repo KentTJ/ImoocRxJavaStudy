@@ -10,6 +10,7 @@ import com.nicro.async.imitate2.Callee;
 import com.nicro.async.imitate2.Caller;
 import com.nicro.async.imitate2.CallerEmitter;
 import com.nicro.async.imitate2.CallerOnCall;
+import com.nicro.async.imitate2.CallerOperator;
 import com.nicro.async.imitate2.Release;
 import com.nicro.imoocrxjavastudy.R;
 
@@ -181,6 +182,71 @@ public class OperatorDemo extends AppCompatActivity {
                     }
                 }).
                 call(new Callee<Integer>() {
+                    @Override
+                    public void OnCall(Release release) {
+                        Log.d(TAG, "OnCall");
+                    }
+
+                    @Override
+                    public void OnReceive(Integer integer) {
+                        Log.d(TAG, "OnReceive " + integer);
+                    }
+
+                    @Override
+                    public void OnCompleted() {
+                        Log.d(TAG, "OnCompleted");
+                    }
+
+                    @Override
+                    public void OnError(Throwable t) {
+
+                    }
+                });
+
+    }
+
+    /**
+     * 仿写RxJava2扩展操作符实例的使用demo。模拟map的效果。
+     *
+     * @param view
+     */
+    public void Imitate_lift_rxJava2_no_backpressure(View view) {
+        Caller.
+                create(new CallerOnCall<String>() {
+                    @Override
+                    public void call(CallerEmitter<String> callerEmitter) {
+                        callerEmitter.onReceive("3");
+                        callerEmitter.onReceive("4");
+                        callerEmitter.onCompleted();
+                    }
+                }).
+                lift(new CallerOperator<Integer, String>() {
+                    @Override
+                    public Callee<String> call(final Callee<Integer> callee) {
+                        return new Callee<String>() {
+                            @Override
+                            public void OnCall(Release release) {
+                                callee.OnCall(release);
+                            }
+
+                            @Override
+                            public void OnReceive(String s) {
+                                callee.OnReceive(Integer.parseInt(s));
+                            }
+
+                            @Override
+                            public void OnCompleted() {
+                                callee.OnCompleted();
+                            }
+
+                            @Override
+                            public void OnError(Throwable t) {
+                                callee.OnError(t);
+                            }
+                        };
+                    }
+                })
+                .call(new Callee<Integer>() {
                     @Override
                     public void OnCall(Release release) {
                         Log.d(TAG, "OnCall");
