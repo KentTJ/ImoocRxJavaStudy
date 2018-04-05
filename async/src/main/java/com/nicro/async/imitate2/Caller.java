@@ -16,4 +16,8 @@ public abstract class Caller<T> {
     }
 
     protected abstract void callActual(Callee<T> callee);
+
+    public <R> Caller<R> map(Function<T, R> function) {
+        return new CallerMap<>(this, function);
+    }
 }
