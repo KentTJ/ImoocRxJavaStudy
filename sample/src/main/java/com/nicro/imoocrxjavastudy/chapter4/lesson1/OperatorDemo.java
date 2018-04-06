@@ -12,8 +12,20 @@ import com.nicro.async.imitate2.CallerEmitter;
 import com.nicro.async.imitate2.CallerOnCall;
 import com.nicro.async.imitate2.CallerOperator;
 import com.nicro.async.imitate2.Release;
+import com.nicro.async.imitate2.backpressure.Drop;
+import com.nicro.async.imitate2.backpressure.Receiver;
+import com.nicro.async.imitate2.backpressure.Telephoner;
+import com.nicro.async.imitate2.backpressure.TelephonerEmitter;
+import com.nicro.async.imitate2.backpressure.TelephonerOnCall;
 import com.nicro.imoocrxjavastudy.R;
 
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
+
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableEmitter;
+import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.Observable;
 import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
@@ -220,7 +232,7 @@ public class OperatorDemo extends AppCompatActivity {
                         callerEmitter.onCompleted();
                     }
                 }).
-                lift(new CallerOperator<Integer, String>() {
+                lift(new CallerOperator<Integer, String>() {//注意此处泛型的顺序。
                     @Override
                     public Callee<String> call(final Callee<Integer> callee) {
                         return new Callee<String>() {
@@ -265,6 +277,104 @@ public class OperatorDemo extends AppCompatActivity {
                     @Override
                     public void OnError(Throwable t) {
 
+                    }
+                });
+
+    }
+
+    /**
+     * RxJava2 有背压版 使用实例
+     *
+     * @param view
+     */
+    public void RxJava2_demo_with_backpressure(View view) {
+        Flowable.
+                create(new FlowableOnSubscribe<String>() {
+                    @Override
+                    public void subscribe(FlowableEmitter<String> e) throws Exception {
+                        if (!e.isCancelled()) {
+                            e.onNext("1");
+                            e.onNext("2");
+                            e.onNext("3");
+                            e.onNext("4");
+                            e.onNext("5");
+                            e.onNext("6");
+                            e.onComplete();
+                        }
+                    }
+                }, BackpressureStrategy.DROP).
+                map(new Function<String, Integer>() {
+                    @Override
+                    public Integer apply(String s) throws Exception {
+                        return Integer.parseInt(s);
+                    }
+                }).
+                subscribe(new Subscriber<Integer>() {
+                    @Override
+                    public void onSubscribe(Subscription s) {
+                        Log.d(TAG, "onSubscribe");
+                        s.request(Long.MAX_VALUE);
+                    }
+
+                    @Override
+                    public void onNext(Integer integer) {
+                        Log.d(TAG, "onNext " + integer);
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        Log.d(TAG, "onComplete");
+                    }
+                });
+
+    }
+
+    /**
+     * 仿写RxJava2有背压版demo使用的实例
+     *
+     * @param view
+     */
+    public void Imitate_RxJava2__with_backpressure(View view) {
+        Telephoner.
+                create(new TelephonerOnCall<String>() {
+                    @Override
+                    public void call(TelephonerEmitter<String> telephonerEmitter) {
+                        telephonerEmitter.onReceive("233");
+                        telephonerEmitter.onReceive("236");
+                        telephonerEmitter.onCompleted();
+                    }
+                }).
+                map(new com.nicro.async.imitate2.Function<String, Integer>() {
+                    @Override
+                    public Integer call(String s) {
+                        return Integer.parseInt(s);
+                    }
+                }).
+                call(new Receiver<Integer>() {
+                    @Override
+                    public void onCall(Drop d) {
+                        d.request(Long.MAX_VALUE);
+                        Log.d(TAG, "onCall");
+                    }
+
+                    @Override
+                    public void onReceiver(Integer integer) {
+                        Log.d(TAG, "onReceiver " + integer);
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        Log.d(TAG, "onCompleted");
                     }
                 });
 

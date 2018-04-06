@@ -1,5 +1,7 @@
 package com.nicro.async.imitate2.backpressure;
 
+import com.nicro.async.imitate2.Function;
+
 /**
  * Created by rongwenzhao on 2018/4/3.
  * 打电话的人
@@ -16,4 +18,8 @@ public abstract class Telephoner<T> {
     }
 
     protected abstract void callActual(Receiver<T> receiver);
+
+    public <R> Telephoner<R> map(Function<T, R> function) {
+        return new TelephonerMap<>(this, function);
+    }
 }

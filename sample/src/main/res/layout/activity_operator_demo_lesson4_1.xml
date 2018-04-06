@@ -35,4 +35,16 @@
         android:onClick="Imitate_lift_rxJava2_no_backpressure"
         android:text="Imitate_lift_RxJava2_no_backpressure" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="RxJava2_demo_with_backpressure"
+        android:text="RxJava2_demo_with_backpressure" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="Imitate_RxJava2__with_backpressure"
+        android:text="Imitate_RxJava2__with_backpressure" />
+
 </LinearLayout>
