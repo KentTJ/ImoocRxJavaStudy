@@ -22,4 +22,8 @@ public abstract class Telephoner<T> {
     public <R> Telephoner<R> map(Function<T, R> function) {
         return new TelephonerMap<>(this, function);
     }
+
+    public <R> Telephoner<R> lift(TelephonerOperator<R, T> telephonerOperator) {
+        return new TelephonerLift<>(this, telephonerOperator);
+    }
 }

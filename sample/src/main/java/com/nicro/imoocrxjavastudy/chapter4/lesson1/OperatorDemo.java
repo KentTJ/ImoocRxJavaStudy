@@ -17,6 +17,7 @@ import com.nicro.async.imitate2.backpressure.Receiver;
 import com.nicro.async.imitate2.backpressure.Telephoner;
 import com.nicro.async.imitate2.backpressure.TelephonerEmitter;
 import com.nicro.async.imitate2.backpressure.TelephonerOnCall;
+import com.nicro.async.imitate2.backpressure.TelephonerOperator;
 import com.nicro.imoocrxjavastudy.R;
 
 import org.reactivestreams.Subscriber;
@@ -370,6 +371,77 @@ public class OperatorDemo extends AppCompatActivity {
                     @Override
                     public void onError(Throwable t) {
 
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        Log.d(TAG, "onCompleted");
+                    }
+                });
+
+    }
+
+    /**
+     * RxJava2有背压版，仿自定义操作符demo
+     *
+     * @param view
+     */
+    public void Imitate_lift_RxJava2_with_backpressure(View view) {
+        Telephoner.
+                create(new TelephonerOnCall<String>() {
+                    @Override
+                    public void call(TelephonerEmitter<String> telephonerEmitter) {
+                        telephonerEmitter.onReceive("1122");
+                        telephonerEmitter.onReceive("3344");
+                        telephonerEmitter.onReceive("5566");
+                        telephonerEmitter.onCompleted();
+
+                    }
+                }).
+                //lift操作符变换部分。自定义扩展部分。
+                        lift(new TelephonerOperator<Integer, String>() {
+                    @Override
+                    public Receiver<String> call(final Receiver<Integer> callee) {
+                        return new Receiver<String>() {
+                            @Override
+                            public void onCall(Drop d) {
+                                callee.onCall(d);
+                            }
+
+                            @Override
+                            public void onReceiver(String s) {
+                                Integer integer = Integer.parseInt(s);
+                                callee.onReceiver(integer);
+                            }
+
+                            @Override
+                            public void onError(Throwable t) {
+                                callee.onError(t);
+                            }
+
+                            @Override
+                            public void onCompleted() {
+                                callee.onCompleted();
+                            }
+                        };
+                    }
+                }).
+                call(new com.nicro.async.imitate2.backpressure.Receiver<Integer>() {
+
+                    @Override
+                    public void onCall(Drop d) {
+                        Log.d(TAG, "onCall");
+                        d.request(Long.MAX_VALUE);
+                    }
+
+                    @Override
+                    public void onReceiver(Integer integer) {
+                        Log.d(TAG, "onReceiver " + integer);
+                    }
+
+                    @Override
+                    public void onError(Throwable t) {
+                        Log.d(TAG, "onError");
                     }
 
                     @Override
