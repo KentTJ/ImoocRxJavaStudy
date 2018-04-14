@@ -21,6 +21,7 @@
         <activity android:name=".chapter3.lesson5.Lesson3_5Activity"></activity>
         <activity android:name=".chapter3.lesson5.Lesson3_6_ImidateRx2Activity" />
         <activity android:name=".chapter4.lesson1.OperatorDemo" />
+        <activity android:name=".chapter5.ThreadTransformDemoActivity" />
     </application>
 
 </manifest>

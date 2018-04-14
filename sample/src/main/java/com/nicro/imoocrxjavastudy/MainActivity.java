@@ -9,6 +9,7 @@ import com.nicro.imoocrxjavastudy.chapter3.lesson1.Lesson3_1Activity;
 import com.nicro.imoocrxjavastudy.chapter3.lesson5.Lesson3_5Activity;
 import com.nicro.imoocrxjavastudy.chapter3.lesson5.Lesson3_6_ImidateRx2Activity;
 import com.nicro.imoocrxjavastudy.chapter4.lesson1.OperatorDemo;
+import com.nicro.imoocrxjavastudy.chapter5.ThreadTransformDemoActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,5 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void chapter4(View view) {
         startActivity(new Intent(this, OperatorDemo.class));
+    }
+
+    public void chapter5(View view) {
+        startActivity(new Intent(this, ThreadTransformDemoActivity.class));
     }
 }

@@ -51,5 +51,15 @@ public class Caller<T> {
         return lift(new MapOperator<T, R>(func));
     }
 
+    /**
+     * 类似于RxJava1中的SubscriberOn方法。
+     *
+     * @param switcher
+     * @return
+     */
+    public final Caller<T> callOn(Switcher switcher) {
+        return create(new OperatorCallOn<T>(switcher, this));
+    }
+
 
 }

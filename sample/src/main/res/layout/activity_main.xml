@@ -28,4 +28,10 @@
         android:onClick="chapter4"
         android:text="chapter4_opoerator" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="chapter5"
+        android:text="chapter5_threadTransform" />
+
 </LinearLayout>

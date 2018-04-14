@@ -20,20 +20,6 @@ import com.nicro.async.imitate2.backpressure.TelephonerOnCall;
 import com.nicro.async.imitate2.backpressure.TelephonerOperator;
 import com.nicro.imoocrxjavastudy.R;
 
-import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
-
-import io.reactivex.BackpressureStrategy;
-import io.reactivex.Flowable;
-import io.reactivex.FlowableEmitter;
-import io.reactivex.FlowableOnSubscribe;
-import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Function;
-
 /**
  * Created by rongwenzhao on 2018/4/4.
  * RxJava1与RxJava2操作符Demo
@@ -131,7 +117,7 @@ public class OperatorDemo extends AppCompatActivity {
      * @param view
      */
     public void demo_rxJava2_no_backpressure(View view) {
-        Observable.
+       /* Observable.
                 create(new ObservableOnSubscribe<String>() {
                     @Override
                     public void subscribe(ObservableEmitter<String> e) throws Exception {
@@ -168,7 +154,7 @@ public class OperatorDemo extends AppCompatActivity {
                     public void onComplete() {
                         Log.d(TAG, "onComplete");
                     }
-                });
+                });*/
 
     }
 
@@ -289,7 +275,7 @@ public class OperatorDemo extends AppCompatActivity {
      * @param view
      */
     public void RxJava2_demo_with_backpressure(View view) {
-        Flowable.
+        /*Flowable.
                 create(new FlowableOnSubscribe<String>() {
                     @Override
                     public void subscribe(FlowableEmitter<String> e) throws Exception {
@@ -331,7 +317,7 @@ public class OperatorDemo extends AppCompatActivity {
                     public void onComplete() {
                         Log.d(TAG, "onComplete");
                     }
-                });
+                });*/
 
     }
 
