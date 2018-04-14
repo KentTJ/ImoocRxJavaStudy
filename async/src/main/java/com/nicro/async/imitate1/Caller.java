@@ -61,5 +61,9 @@ public class Caller<T> {
         return create(new OperatorCallOn<T>(switcher, this));
     }
 
+    public final Caller<T> callbackOn(Switcher switcher) {
+        return lift(new OperatorCallbackOn<T>(switcher));
+    }
+
 
 }

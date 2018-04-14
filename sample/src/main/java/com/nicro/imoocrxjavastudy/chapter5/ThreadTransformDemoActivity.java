@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.nicro.async.imitate1.Caller;
+import com.nicro.async.imitate1.LooperSwitcher;
 import com.nicro.async.imitate1.NewThreadSwitcher;
 import com.nicro.async.imitate1.Receiver;
 import com.nicro.imoocrxjavastudy.R;
@@ -87,6 +88,7 @@ public class ThreadTransformDemoActivity extends AppCompatActivity {
                     }
                 })
                 .callOn(new NewThreadSwitcher())
+                .callbackOn(new LooperSwitcher(getMainLooper()))
                 .call(new Receiver<String>() {
                     @Override
                     public void onCompleted() {
