@@ -12,7 +12,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="demo_rx1_rx2"
+        android:onClick="doOkHttp"
         android:text="OkHTTP" />
 
 </LinearLayout>
