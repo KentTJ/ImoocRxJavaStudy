@@ -12,13 +12,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="doOkHttp"
-        android:text="OkHTTP" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="doRetrofit"
-        android:text="Retrofit" />
+        android:onClick="onRequest"
+        android:text="doRequest" />
 
 </LinearLayout>

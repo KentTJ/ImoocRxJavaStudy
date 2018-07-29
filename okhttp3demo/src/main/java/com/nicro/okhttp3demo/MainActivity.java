@@ -1,10 +1,13 @@
 package com.nicro.okhttp3demo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+
+import com.nicro.okhttp3demo.retrofit_part.RetrofitActivity;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,5 +67,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    /**
+     * Retrofit请求的实例入口
+     *
+     * @param view
+     */
+    public void doRetrofit(View view) {
+        startActivity(new Intent(MainActivity.this, RetrofitActivity.class));
     }
 }
