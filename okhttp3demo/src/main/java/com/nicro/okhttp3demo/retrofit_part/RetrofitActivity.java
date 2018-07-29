@@ -7,6 +7,8 @@ import android.view.View;
 
 import com.nicro.okhttp3demo.R;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -59,5 +61,15 @@ public class RetrofitActivity extends AppCompatActivity {
     public void onRequest(View view) {
         request();
         // 使用Retrofit封装的方法
+    }
+
+    public void githubDemoRequest() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("https://api.github.com/")
+                .build();
+
+        GitHubService service = retrofit.create(GitHubService.class);
+
+        Call<List<Repo>> repos = service.listRepos("octocat");
     }
 }
