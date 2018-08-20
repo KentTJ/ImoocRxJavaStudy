@@ -13,7 +13,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
@@ -34,7 +34,8 @@ public class RetrofitActivity extends AppCompatActivity {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://fy.iciba.com/") // 设置 网络请求 Url
                 .addConverterFactory(GsonConverterFactory.create()) //设置使用Gson解析(记得加入依赖)
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create()) //支持RxJava2平台
+                //.addCallAdapterFactory(RxJava2CallAdapterFactory.create()) //支持RxJava2平台
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create()) //支持RxJava1平台
                 .build();
 
         // 步骤5:创建 网络请求接口 的实例
