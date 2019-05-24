@@ -1,0 +1,13 @@
+@startuml
+/'Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response'/
+
+user ->  Activity:  startActivity(Intent)
+Activity -> Activity : startActivityForResult
+Activity -> Instrumentation: execStartActivity
+Instrumentation -> IActivityManager:startActivity
+IActivityManager->mRemote:mRemote.transact(Stub.TRANSACTION_startActivity, _data, _reply, 0);
+@enduml

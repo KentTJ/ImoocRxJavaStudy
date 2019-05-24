@@ -1,0 +1,27 @@
+@startuml
+
+'create new Process'
+
+ActivityStackSupervisor -> ActivityManagerService: startProcessLocked
+ActivityManagerService -> ActivityManagerService: startProcessLocked ...
+ActivityManagerService -> ActivityManagerService: startProcessLocked
+ActivityManagerService -> ActivityManagerService: startProcess
+ActivityManagerService -> Process: start
+Process -> ZygoteProcess: start
+ZygoteProcess -> ZygoteProcess: startViaZygote
+'startViaZygote do things'
+'return zygoteSendArgsAndGetResult(openZygoteSocketIfNeeded(abi),
+ '                                              useBlastulaPool,
+ '                                              argsForZygote);'
+
+ '1、    openZygoteSocketIfNeeded'
+ '2、    zygoteSendArgsAndGetResult'
+
+
+
+
+
+ActivityManagerService -> ActivityManagerService: handleProcessStartedLocked
+'handleProcessStartedLocked register PROC_START_TIMEOUT_MSG, if new started Process do not talk with AMS in 10s,timeout ,components like Activitys,Services,Providers in this Process will be recycled'
+
+@enduml

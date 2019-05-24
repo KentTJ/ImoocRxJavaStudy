@@ -1,0 +1,25 @@
+@startuml
+/'Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response'/
+
+/'ActivityManagerService extends IActivityManager.Stub
+   so  IActivityManager.Stub == ActivityManagerService
+'/
+mRemote -> ActivityManagerService:AMS onTransact$startActivity
+ActivityManagerService -> ActivityManagerService:startActivity
+ActivityManagerService -> ActivityStarter: startActivityAsUser
+ActivityStarter -> ActivityStarter: startActivity
+ActivityStarter -> ActivityStarter: startActivityUnchecked
+ActivityStarter -> ActivityStack: startActivityLocked
+ActivityStack -> ActivityStack: ensureActivitiesVisibleLocked
+ActivityStack -> ActivityStack: makeVisibleAndRestartIfNeeded
+
+ActivityStack->ActivityStackSupervisor:startSpecificActivityLocked
+
+
+
+
+@enduml
