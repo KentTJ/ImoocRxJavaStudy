@@ -64,6 +64,11 @@ ZygoteProcess -> ZygoteProcess: startViaZygote
 '1、 to remove 10s timeout message'
 '2、 AMS use ApplicationThread binder to call APP side'
 
+'mgr.attachApplication -> AMS:attachApplication'
+'AMS:attachApplication -> AMS:attachApplicationLocked'
+'AMS:attachApplicationLocked -> IApplicationThread:bindApplication(create Application in APP Process and do some init)'
+
+
 
 'in child process (APP Process) desc end'
 
