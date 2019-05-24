@@ -18,6 +18,61 @@ ZygoteProcess -> ZygoteProcess: startViaZygote
  '2、    zygoteSendArgsAndGetResult'
 
 
+'in Zygote Process begin'
+'ZygoteConnection : processOneCommand'
+'Zygote.readArgumentList'
+'Zygote.forkAndSpecialize'
+
+ '           if (pid == 0) {
+ '                // in child
+ '                zygoteServer.setForkChild();
+ '
+ '                zygoteServer.closeServerSocket();
+ '                IoUtils.closeQuietly(serverPipeFd);
+ '                serverPipeFd = null;
+ '
+ '                return handleChildProc(parsedArgs, descriptors, childPipeFd,
+ '                        parsedArgs.mStartChildZygote);
+ '            } else {
+ '                // In the parent. A pid < 0 indicates a failure and will be handled in
+ '                // handleParentProc.
+ '                IoUtils.closeQuietly(childPipeFd);
+ '                childPipeFd = null;
+ '                handleParentProc(pid, descriptors, serverPipeFd);
+ '                return null;
+ '            }'
+
+ 'in Zygote Process end'
+
+'in child process (APP Process) desc begin'
+'ZygoteConnection : handleChildProc'
+'ZygoteInit : zygoteInit'
+'ZygoteInit : zygoteInit do some init of APP Process'
+'call ActivityThread main function,do main looper'
+'in ActivityThread main function, following code '
+'ActivityThread thread = new ActivityThread();
+ '        thread.attach(false, startSeq);'
+'thread.attach(false, startSeq) '
+'final IActivityManager mgr = ActivityManager.getService();
+ '            try {
+ '                mgr.attachApplication(mAppThread, startSeq);
+ '            } catch (RemoteException ex) {
+ '                throw ex.rethrowFromSystemServer();
+ '            }'
+
+'APP Process register ApplicationThread instance binder to AMS '
+'1、 to remove 10s timeout message'
+'2、 AMS use ApplicationThread binder to call APP side'
+
+
+'in child process (APP Process) desc end'
+
+
+
+'in parent process (Zygote Process)'
+
+
+
 
 
 
