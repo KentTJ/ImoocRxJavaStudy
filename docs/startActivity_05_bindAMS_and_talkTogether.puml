@@ -39,11 +39,22 @@ Instrumentation -> Activity: performCreate
 Activity -> Activity: onCreate
 
 TransactionExecutor -> TransactionExecutor:executeLifecycleState
+TransactionExecutor -> ResumeActivityItem:execute
+ResumeActivityItem -> ActivityThread: handleResumeActivity
+ActivityThread -> ActivityThread: performResumeActivity
+ActivityThread -> Activity: performResume
+Activity -> Activity: performRestart(start)
+Activity -> Activity: performStart
+Activity -> Instrumentation: callActivityOnStart
+Instrumentation -> Activity: onStart
+Activity -> Instrumentation: callActivityOnResume
+Instrumentation -> Activity: onResume
+
 
 
 'Service'
-AMS -> ActiveServices: attachApplicationLocked
+'AMS -> ActiveServices: attachApplicationLocked'
 'Broadcast'
-AMS -> AMS: isPendingBroadcastProcessLocked
+'AMS -> AMS: isPendingBroadcastProcessLocked'
 
 @enduml
