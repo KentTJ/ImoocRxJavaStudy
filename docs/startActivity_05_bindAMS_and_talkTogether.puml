@@ -1,0 +1,26 @@
+@startuml
+ActivityThread -> ActivityThread: main prepare looper
+ActivityThread -> ActivityThread : attach
+ActivityThread -> IActivityManager: attachApplication
+
+IActivityManager -> AMS: attachApplication
+AMS -> AMS: attachApplicationLocked
+AMS -> Handler:send remove PROC_START_TIMEOUT_MSG
+AMS -> IApplicationThread: bindApplication
+IApplicationThread -> H:BIND_APPLICATION (sub thread)
+H -> ActivityThread: handleBindApplication (main thread)
+ActivityThread -> LoadedApk: makeApplication
+ActivityThread -> Instrumentation: callApplicationOnCreate
+Instrumentation -> Application: onCreate
+
+'APP is ok, next do start components'
+'Activity '
+AMS -> ActivityStackSupervisor: attachApplicationLocked
+
+
+
+
+AMS -> ActiveServices: attachApplicationLocked
+AMS -> AMS: isPendingBroadcastProcessLocked
+
+@enduml
