@@ -16,11 +16,34 @@ Instrumentation -> Application: onCreate
 'APP is ok, next do start components'
 'Activity '
 AMS -> ActivityStackSupervisor: attachApplicationLocked
+'focused stack'
+ActivityStackSupervisor -> ActivityStack: topRunningActivityLocked
+ActivityStack --> ActivityStackSupervisor: ActivityRecord top
+ActivityStackSupervisor -> ActivityStackSupervisor: realStartActivityLocked
+ActivityStackSupervisor -> ClientTransaction: addCallback (LaunchActivityItem)
+
+'perform onCreate of Activity'
+AMS -> AMS: getLifecycleManager
+AMS -> ClientLifecycleManager: scheduleTransaction
+ClientLifecycleManager -> ClientTransaction: schedule
+ClientTransaction -> IApplicationThread: scheduleTransaction
+IApplicationThread -> ActivityThread: scheduleTransaction
+ActivityThread -> H: EXECUTE_TRANSACTION
+H -> TransactionExecutor: execute
+TransactionExecutor -> TransactionExecutor: executeCallbacks(ClientTransactionHandler==ActivityThread)
+TransactionExecutor -> LaunchActivityItem: execute
+LaunchActivityItem -> ActivityThread: handleLaunchActivity
+ActivityThread -> ActivityThread: performLaunchActivity
+ActivityThread -> Instrumentation: callActivityOnCreate
+Instrumentation -> Activity: performCreate
+Activity -> Activity: onCreate
+
+TransactionExecutor -> TransactionExecutor:executeLifecycleState
 
 
-
-
+'Service'
 AMS -> ActiveServices: attachApplicationLocked
+'Broadcast'
 AMS -> AMS: isPendingBroadcastProcessLocked
 
 @enduml
