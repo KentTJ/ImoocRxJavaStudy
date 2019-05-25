@@ -9,6 +9,9 @@ ActivityManagerService -> ActivityManagerService: startProcess
 ActivityManagerService -> Process: start
 Process -> ZygoteProcess: start
 ZygoteProcess -> ZygoteProcess: startViaZygote
+
+
+
 'startViaZygote do things'
 'return zygoteSendArgsAndGetResult(openZygoteSocketIfNeeded(abi),
  '                                              useBlastulaPool,
@@ -52,7 +55,7 @@ ZygoteProcess -> ZygoteProcess: startViaZygote
 'in ActivityThread main function, following code '
 'ActivityThread thread = new ActivityThread();
  '        thread.attach(false, startSeq);'
-'thread.attach(false, startSeq) '
+'code of attach as : '
 'final IActivityManager mgr = ActivityManager.getService();
  '            try {
  '                mgr.attachApplication(mAppThread, startSeq);
@@ -67,6 +70,21 @@ ZygoteProcess -> ZygoteProcess: startViaZygote
 'mgr.attachApplication -> AMS:attachApplication'
 'AMS:attachApplication -> AMS:attachApplicationLocked'
 'AMS:attachApplicationLocked -> IApplicationThread:bindApplication(create Application in APP Process and do some init)'
+
+'next in AMS,in attachApplicationLocked function, do some app component start using method like : '
+
+'Activity'
+'mStackSupervisor.attachApplicationLocked(app)'
+
+'Service'
+'mServices.attachApplicationLocked(app, processName)'
+
+'Broadcast'
+'isPendingBroadcastProcessLocked(pid)'
+
+
+
+
 
 
 
