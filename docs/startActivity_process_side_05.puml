@@ -1,0 +1,27 @@
+@startuml
+title startActivity, Process's info
+
+autonumber
+User -> AMS : startActivity Request
+note left
+user or Launcher
+startActivity action
+end note
+
+AMS -> Zygote: startProcess Request
+
+Zygote -> UserAPP: startProcess
+
+UserAPP -> AMS: attachApplication
+note left
+in ActivityThread main method,
+attach method
+end note
+
+AMS -> UserAPP: bindApplication
+note right: create Application and init other things
+
+AMS -> UserAPP: scheduleLauncherActivity
+note right: do Activity lifecycle
+
+@enduml
