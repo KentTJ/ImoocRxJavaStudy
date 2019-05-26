@@ -28,14 +28,12 @@ AMS -> ActivityThread: bindApplication
 note right: create Application and init other things
 
 AMS -> ActiveServices: attachApplicationLocked
-
-ActiveServices -> ActiveServices: realStartServiceLocked
 note right
+mPendingServices.get(i)
 mPendingServices.remove(i)
 then call realStartServiceLocked
-this method sequence see
-app is already ok time.
 end note
 
+ActiveServices -> ActiveServices: realStartServiceLocked
 
 @enduml
