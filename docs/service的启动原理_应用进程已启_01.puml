@@ -6,26 +6,50 @@ ContextImpl -> IActivityManager: startService
 
 IActivityManager -> AMS: startService
 AMS -> ActiveServices: startServiceLocked
+ActiveServices -> ServiceRecord: r.pendingStarts.add(StartItem)
 ActiveServices -> ActiveServices: startServiceInnerLocked
 ActiveServices -> ActiveServices: bringUpServiceLocked
-note right
-do not call followings method,
-this serviceRecord will add into
-mPendingServices list.
-then fork new Process, when Process started,
-use mPendingServices to realStart service.
-see next app not started.
-end note
+'case 1 begin'
 ActiveServices -> ActiveServices: sendServiceArgsLocked
+
 note left
+case 1:
+service is already started,
 ProcessRecode is ok,
 and IApplicationThread is ok,
 then do this method.
 end note
+
+ActiveServices -> IApplicationThread: scheduleServiceArgs
+IApplicationThread -> ActivityThread: sendMessage
+ActivityThread -> H: handleMessage(in main thread)
+note right: msg.what = SERVICE_ARGS
+H -> ActivityThread: handleServiceArgs
+ActivityThread -> Service: onStartCommand
+ActivityThread -> IActivityManager: serviceDoneExecuting
+note right: SERVICE_DONE_EXECUTING_START
+IActivityManager -> AMS: serviceDoneExecuting
+AMS -> ActiveServices: serviceDoneExecutingLocked
+ActiveServices -> ActiveServices: serviceDoneExecutingLocked
+note right: over
+
+'this case over, service started finished and ok.'
+'case 1 end'
+
+
+'case 2 begin'
 ActiveServices -> AMS:getProcessRecordLocked
 AMS --> ActiveServices: ProcessRecord app
 ActiveServices -> ActiveServices: realStartServiceLocked
-note left: app != null && app.thread != null
+
+note left
+case 2
+app != null && app.thread != null
+Process is already startup,
+and IApplicationThread is already in AMS,
+call realStartServiceLocked.
+end note
+
 ActiveServices -> IApplicationThread: scheduleCreateService
 IApplicationThread -> ActivityThread: sendMessage
 ActivityThread -> H: handleMessage(in main thread)
@@ -41,9 +65,37 @@ in handleCreateService method,
 ServiceRecord is a Binder,and data.token is ServiceRecord.
 ServiceRecord represent the same one service in both client and AMS side.
 end note
+ActivityThread -> IActivityManager: serviceDoneExecuting
+IActivityManager -> AMS: serviceDoneExecuting
+AMS -> ActiveServices: serviceDoneExecutingLocked
+ActiveServices -> ActiveServices: serviceDoneExecutingLocked
+note right:
 
+ActiveServices -> ActiveServices: sendServiceArgsLocked
+ActiveServices -> IApplicationThread: scheduleServiceArgs
+IApplicationThread -> ActivityThread: sendMessage
+ActivityThread -> H: handleMessage(in main thread)
+note right: msg.what = SERVICE_ARGS
+H -> ActivityThread: handleServiceArgs
+ActivityThread -> Service: onStartCommand
 
+'case 2 end'
 
+'case 3 begin'
+'startProcessLocked'
+'mPendingServices.add(r)'
+ActiveServices -> AMS: startProcessLocked
+note right
+case 3
+Process is not ok,
+start Process,put serviceRecord
+into mPendingServices list,
+when APP Process is ok,
+using mPendingServices start the service.
+end note
+AMS --> ActiveServices: ProcessRecord app
+ActiveServices -> mPendingServices: mPendingServices.add(r)
+'case 3 end'
 
 
 @enduml
