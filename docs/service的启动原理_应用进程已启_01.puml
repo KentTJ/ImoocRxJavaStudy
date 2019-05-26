@@ -51,6 +51,7 @@ call realStartServiceLocked.
 end note
 
 ActiveServices -> IApplicationThread: scheduleCreateService
+note right: android.os.IBinder.FLAG_ONEWAY
 IApplicationThread -> ActivityThread: sendMessage
 ActivityThread -> H: handleMessage(in main thread)
 note right: msg.what = CREATE_SERVICE
