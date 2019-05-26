@@ -1,0 +1,39 @@
+@startuml
+title startService with start Process
+
+User -> AMS : startService Request
+note left
+user or other APP
+startService action
+end note
+
+AMS -> Zygote: startProcess Request
+note right
+IPC use Socket
+other places use binder
+end note
+
+Zygote -> UserAPP: startProcess
+
+UserAPP -> ActivityThread: ActivityThread:main
+note right
+in UserAPP Process
+end note
+
+ActivityThread -> AMS: attachApplication
+
+AMS -> AMS: attachApplicationLocked
+
+AMS -> ActivityThread: bindApplication
+note right: create Application and init other things
+
+AMS -> ActiveServices: attachApplicationLocked
+
+ActiveServices -> ActiveServices: realStartServiceLocked
+note right
+mPendingServices.remove(i)
+then call realStartServiceLocked
+end note
+
+
+@enduml
