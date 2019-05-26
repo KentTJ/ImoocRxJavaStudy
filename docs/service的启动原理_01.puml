@@ -1,0 +1,41 @@
+@startuml
+user -> Activity: startService
+Activity -> ContextImpl: startService
+ContextImpl -> ContextImpl: startServiceCommon
+ContextImpl -> IActivityManager: startService
+
+IActivityManager -> AMS: startService
+AMS -> ActiveServices: startServiceLocked
+ActiveServices -> ActiveServices: startServiceInnerLocked
+ActiveServices -> ActiveServices: bringUpServiceLocked
+ActiveServices -> ActiveServices: sendServiceArgsLocked
+note left
+ProcessRecode is ok,
+and IApplicationThread is ok,
+then do this method.
+end note
+ActiveServices -> AMS:getProcessRecordLocked
+AMS --> ActiveServices: ProcessRecord app
+ActiveServices -> ActiveServices: realStartServiceLocked
+note left: app != null && app.thread != null
+ActiveServices -> IApplicationThread: scheduleCreateService
+IApplicationThread -> ActivityThread: sendMessage
+ActivityThread -> H: handleMessage(in main thread)
+note right: msg.what = CREATE_SERVICE
+H -> ActivityThread: handleCreateService
+ActivityThread -> Service: onCreate
+note left
+in handleCreateService method,
+1. create service instance
+2. do attach(Context,application,token...)
+3. service.onCreate()
+4. mServices.put(data.token, service)
+ServiceRecord is a Binder,and data.token is ServiceRecord.
+ServiceRecord represent the same one service in both client and AMS side.
+end note
+
+
+
+
+
+@enduml
