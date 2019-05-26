@@ -9,6 +9,10 @@ startActivity action
 end note
 
 AMS -> Zygote: startProcess Request
+note right
+IPC use Socket
+other places use binder
+end note
 
 Zygote -> UserAPP: startProcess
 
