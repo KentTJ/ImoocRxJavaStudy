@@ -33,6 +33,8 @@ ActiveServices -> ActiveServices: realStartServiceLocked
 note right
 mPendingServices.remove(i)
 then call realStartServiceLocked
+this method sequence see
+app is already ok time.
 end note
 
 

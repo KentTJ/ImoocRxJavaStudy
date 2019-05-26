@@ -8,6 +8,14 @@ IActivityManager -> AMS: startService
 AMS -> ActiveServices: startServiceLocked
 ActiveServices -> ActiveServices: startServiceInnerLocked
 ActiveServices -> ActiveServices: bringUpServiceLocked
+note right
+do not call followings method,
+this serviceRecord will add into
+mPendingServices list.
+then fork new Process, when Process started,
+use mPendingServices to realStart service.
+see next app not started.
+end note
 ActiveServices -> ActiveServices: sendServiceArgsLocked
 note left
 ProcessRecode is ok,
