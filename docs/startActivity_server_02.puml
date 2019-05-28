@@ -10,7 +10,8 @@ Alice <-- Bob: another authentication Response'/
 '/
 mRemote -> ActivityManagerService:AMS onTransact$startActivity
 ActivityManagerService -> ActivityManagerService:startActivity
-ActivityManagerService -> ActivityStarter: startActivityAsUser
+ActivityManagerService -> ActivityManagerService: startActivityAsUser
+ActivityManagerService -> ActivityStarter: startActivity
 ActivityStarter -> ActivityStarter: startActivity
 ActivityStarter -> ActivityStarter: startActivityUnchecked
 ActivityStarter -> ActivityStack: startActivityLocked
@@ -18,8 +19,4 @@ ActivityStack -> ActivityStack: ensureActivitiesVisibleLocked
 ActivityStack -> ActivityStack: makeVisibleAndRestartIfNeeded
 
 ActivityStack->ActivityStackSupervisor:startSpecificActivityLocked
-
-
-
-
 @enduml
