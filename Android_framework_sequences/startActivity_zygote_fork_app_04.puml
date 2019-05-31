@@ -1,0 +1,15 @@
+@startuml
+AMS -> ZygoteConnection: processOneCommand
+ZygoteConnection -> Zygote: readArgumentList
+ZygoteConnection -> Zygote: forkAndSpecialize
+'pid == 0 APP Process'
+ZygoteConnection -> ZygoteConnection: handleChildProc
+ZygoteConnection -> ZygoteInit: zygoteInit
+ZygoteInit -> RuntimeInit: applicationInit
+RuntimeInit -> ActivityThread: main
+
+'pid > 0 Zygote Process'
+ZygoteConnection -> ZygoteConnection: handleParentProc
+'write new forked process's id to AMS'
+ZygoteConnection -> DataOutputStream: writeInt(pid)
+@enduml

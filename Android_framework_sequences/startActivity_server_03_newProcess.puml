@@ -1,0 +1,105 @@
+@startuml
+
+'create new Process'
+
+ActivityStackSupervisor -> ActivityManagerService: startProcessLocked
+ActivityManagerService -> ActivityManagerService: startProcessLocked ...
+ActivityManagerService -> ActivityManagerService: startProcessLocked
+ActivityManagerService -> ActivityManagerService: startProcess
+ActivityManagerService -> Process: start
+Process -> ZygoteProcess: start
+ZygoteProcess -> ZygoteProcess: startViaZygote
+
+
+
+'startViaZygote do things'
+'return zygoteSendArgsAndGetResult(openZygoteSocketIfNeeded(abi),
+ '                                              useBlastulaPool,
+ '                                              argsForZygote);'
+
+ '1、    openZygoteSocketIfNeeded'
+ '2、    zygoteSendArgsAndGetResult'
+
+
+'in Zygote Process begin'
+'ZygoteConnection : processOneCommand'
+'Zygote.readArgumentList'
+'Zygote.forkAndSpecialize'
+
+ '           if (pid == 0) {
+ '                // in child
+ '                zygoteServer.setForkChild();
+ '
+ '                zygoteServer.closeServerSocket();
+ '                IoUtils.closeQuietly(serverPipeFd);
+ '                serverPipeFd = null;
+ '
+ '                return handleChildProc(parsedArgs, descriptors, childPipeFd,
+ '                        parsedArgs.mStartChildZygote);
+ '            } else {
+ '                // In the parent. A pid < 0 indicates a failure and will be handled in
+ '                // handleParentProc.
+ '                IoUtils.closeQuietly(childPipeFd);
+ '                childPipeFd = null;
+ '                handleParentProc(pid, descriptors, serverPipeFd);
+ '                return null;
+ '            }'
+
+ 'in Zygote Process end'
+
+'in child process (APP Process) desc begin'
+'ZygoteConnection : handleChildProc'
+'ZygoteInit : zygoteInit'
+'ZygoteInit : zygoteInit do some init of APP Process'
+'call ActivityThread main function,do main looper'
+'in ActivityThread main function, following code '
+'ActivityThread thread = new ActivityThread();
+ '        thread.attach(false, startSeq);'
+'code of attach as : '
+'final IActivityManager mgr = ActivityManager.getService();
+ '            try {
+ '                mgr.attachApplication(mAppThread, startSeq);
+ '            } catch (RemoteException ex) {
+ '                throw ex.rethrowFromSystemServer();
+ '            }'
+
+'APP Process register ApplicationThread instance binder to AMS '
+'1、 to remove 10s timeout message'
+'2、 AMS use ApplicationThread binder to call APP side'
+
+'mgr.attachApplication -> AMS:attachApplication'
+'AMS:attachApplication -> AMS:attachApplicationLocked'
+'AMS:attachApplicationLocked -> IApplicationThread:bindApplication(create Application in APP Process and do some init)'
+
+'next in AMS,in attachApplicationLocked function, do some app component start using method like : '
+
+'Activity'
+'mStackSupervisor.attachApplicationLocked(app)'
+
+'Service'
+'mServices.attachApplicationLocked(app, processName)'
+
+'Broadcast'
+'isPendingBroadcastProcessLocked(pid)'
+
+
+
+
+
+
+
+'in child process (APP Process) desc end'
+
+
+
+'in parent process (Zygote Process)'
+
+
+
+
+
+
+ActivityManagerService -> ActivityManagerService: handleProcessStartedLocked
+'handleProcessStartedLocked register PROC_START_TIMEOUT_MSG, if new started Process do not talk with AMS in 10s,timeout ,components like Activitys,Services,Providers in this Process will be recycled'
+
+@enduml

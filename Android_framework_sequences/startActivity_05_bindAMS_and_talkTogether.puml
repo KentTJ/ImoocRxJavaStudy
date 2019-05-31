@@ -1,0 +1,60 @@
+@startuml
+ActivityThread -> ActivityThread: main prepare looper
+ActivityThread -> ActivityThread : attach
+ActivityThread -> IActivityManager: attachApplication
+
+IActivityManager -> AMS: attachApplication
+AMS -> AMS: attachApplicationLocked
+AMS -> Handler:send remove PROC_START_TIMEOUT_MSG
+AMS -> IApplicationThread: bindApplication
+IApplicationThread -> H:BIND_APPLICATION (sub thread)
+H -> ActivityThread: handleBindApplication (main thread)
+ActivityThread -> LoadedApk: makeApplication
+ActivityThread -> Instrumentation: callApplicationOnCreate
+Instrumentation -> Application: onCreate
+
+'APP is ok, next do start components'
+'Activity '
+AMS -> ActivityStackSupervisor: attachApplicationLocked
+'focused stack'
+ActivityStackSupervisor -> ActivityStack: topRunningActivityLocked
+ActivityStack --> ActivityStackSupervisor: ActivityRecord top
+ActivityStackSupervisor -> ActivityStackSupervisor: realStartActivityLocked
+ActivityStackSupervisor -> ClientTransaction: addCallback (LaunchActivityItem)
+
+'perform onCreate of Activity'
+AMS -> AMS: getLifecycleManager
+AMS -> ClientLifecycleManager: scheduleTransaction
+ClientLifecycleManager -> ClientTransaction: schedule
+ClientTransaction -> IApplicationThread: scheduleTransaction
+IApplicationThread -> ActivityThread: scheduleTransaction
+ActivityThread -> H: EXECUTE_TRANSACTION
+H -> TransactionExecutor: execute
+TransactionExecutor -> TransactionExecutor: executeCallbacks(ClientTransactionHandler==ActivityThread)
+TransactionExecutor -> LaunchActivityItem: execute
+LaunchActivityItem -> ActivityThread: handleLaunchActivity
+ActivityThread -> ActivityThread: performLaunchActivity
+ActivityThread -> Instrumentation: callActivityOnCreate
+Instrumentation -> Activity: performCreate
+Activity -> Activity: onCreate
+
+TransactionExecutor -> TransactionExecutor:executeLifecycleState
+TransactionExecutor -> ResumeActivityItem:execute
+ResumeActivityItem -> ActivityThread: handleResumeActivity
+ActivityThread -> ActivityThread: performResumeActivity
+ActivityThread -> Activity: performResume
+Activity -> Activity: performRestart(start)
+Activity -> Activity: performStart
+Activity -> Instrumentation: callActivityOnStart
+Instrumentation -> Activity: onStart
+Activity -> Instrumentation: callActivityOnResume
+Instrumentation -> Activity: onResume
+
+
+
+'Service'
+'AMS -> ActiveServices: attachApplicationLocked'
+'Broadcast'
+'AMS -> AMS: isPendingBroadcastProcessLocked'
+
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+title bindService client side
+Activity -> Activity: bindService
+Activity -> ContextImpl: bindService
+ContextImpl -> ContextImpl: bindServiceCommon
+ContextImpl -> ContextImpl: getActivityToken
+note right
+IBinder token = getActivityToken()
+the token present activity in AMS & WMS,
+init in construct of ActivityRecord,
+trans to APP side by
+ClientTransaction.mActivityToken field in obtain method.
+and stored in ActivityClientRecord token field,
+and ContextImpl mActivityToken field.
+end note
+ContextImpl -> IActivityManager: bindService
+note right
+此处,讨论IServiceConnection.
+IServiceConnection是AIDL文件,并提供connected方法,
+整个IServiceConnection作为绑定服务时,AMS端为请求端
+返回服务的Binder.
+end note
+
+
+IActivityManager -> AMS: bindService
+AMS -> ActiveServices: bindServiceLocked
+
+
+
+@enduml
