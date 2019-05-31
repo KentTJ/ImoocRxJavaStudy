@@ -1,0 +1,58 @@
+@startuml
+AMS -> ActiveServices : bindServiceLocked
+ActiveServices -> ActiveServices : bringUpServiceLocked
+
+ActiveServices -> ActiveServices : realStartServiceLocked
+note right
+realStartServiceLocked:
+
+r.app = app;
+app.thread.scheduleCreateService(...)
+'在客户端启动service，并调用onCreate方法'
+requestServiceBindingsLocked(...)
+'请求service绑定自己的binder到AMS，供其他客户端使用该service'
+sendServiceArgsLocked(...)
+'跟PendingIntents有关，最终会调到service的onStartCommand方法'
+end note
+
+ActiveServices -> ActiveServices : requestServiceBindingsLocked
+'for (int i=r.bindings.size()-1; i>=0; i--) {
+ '            IntentBindRecord ibr = r.bindings.valueAt(i);
+ '            if (!requestServiceBindingLocked(r, ibr, execInFg, false)) {
+ '                break;
+ '            }
+ '        }'
+ActiveServices -> ActiveServices : requestServiceBindingLocked
+note right
+requestServiceBindingLocked:
+
+r.app.thread.scheduleBindService
+end note
+
+ActiveServices -> ApplicationThread : scheduleBindService
+
+ApplicationThread -> H : sendMessage
+
+H -> H : handleMessage
+
+H -> ActivityThread : handleBindService
+
+ActivityThread -> Service : onBind
+
+Service --> ActivityThread : IBinder binder
+
+ActivityThread -> IActivityManager : publishService
+
+IActivityManager -> AMS : publishService
+
+AMS -> ActiveServices : publishServiceLocked
+'Intent.FilterComparison filter
+ '                        = new Intent.FilterComparison(intent);
+ '                IntentBindRecord b = r.bindings.get(filter);
+
+ '根据Intent找到 IntentBindRecord'
+
+ActiveServices -> ConnectionRecord.IServiceConnection : connected
+note right:至此，接上bind流程1补充中的部分，进入请求bindservice端，进行对应处理。
+
+@enduml
