@@ -1,0 +1,26 @@
+@startuml
+'http://plantuml.com/zh/class-diagram
+title bindService AMS 端的主要数据结构
+
+ServiceRecord "1" *-- "many" IntentBindRecord : contains >
+IntentBindRecord "1" *-- "many" AppBindRecord : contains >
+AppBindRecord "1" *-- "many" ConnectionRecord : contains >
+
+note right of ServiceRecord
+应用端的一个Service，在AMS端
+会对应一个ServiceRecord
+end note
+note right of IntentBindRecord
+通过不同的Intent来绑定同一个Service，
+而IntentBindRecord就是一个Intent绑定的记录。
+end note
+note right of AppBindRecord
+上面的IntentBindRecord包含一个或者多个AppBindRecord。
+因为bind这个service的Intent可能来自同一个进程，也可能
+来自不同应用进程。
+end note
+note right of ConnectionRecord
+就是一个进程里面，可能对应多个ConnectionRecord。
+end note
+
+@enduml
