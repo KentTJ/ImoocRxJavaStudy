@@ -1,7 +1,7 @@
 @startuml
 'IServiceConnection: AIDL 文件'
 ContextImpl -> LoadedApk: getServiceDispatcher
-'解释该端代码'
+'解释该段代码'
  'private final ArrayMap<Context, ArrayMap<ServiceConnection, LoadedApk.ServiceDispatcher>> mServices
  '       = new ArrayMap<>();
  ' public final IServiceConnection getServiceDispatcher(ServiceConnection c,
