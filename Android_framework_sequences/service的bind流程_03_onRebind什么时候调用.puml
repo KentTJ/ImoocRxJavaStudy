@@ -1,0 +1,99 @@
+@startuml
+title 绑定service，rebind的时机
+other逻辑 -> ActiveServices : bindServiceLocked
+'if (s.app != null && b.intent.received) {
+ '                // Service is already running, so we can immediately
+ '                // publish the connection.
+ '                try {
+ '                    c.conn.connected(s.name, b.intent.binder, false);
+ '                } catch (Exception e) {
+ '                    Slog.w(TAG, "Failure sending service " + s.shortName
+ '                            + " to connection " + c.conn.asBinder()
+ '                            + " (in " + c.binding.client.processName + ")", e);
+ '                }
+ '
+ '                // If this is the first app connected back to this binding,
+ '                // and the service had previously asked to be told when
+ '                // rebound, then do so.
+ '                if (b.intent.apps.size() == 1 && b.intent.doRebind) {
+ '                    requestServiceBindingLocked(s, b.intent, callerFg, true);
+ '                }'
+
+ActiveServices -> ActiveServices : requestServiceBindingLocked(..., true)
+note right
+如上面注释中的代码，当该ServiceRecord的应用已经启来，
+请求的应用所使用的IntentBindRecord已经请求过service的bind对象，
+并且已经接收到了service的bind对象，
+即received == true，此时进入下一步判断。
+
+若只有一个应用通过该Intent来绑定到service，同时该Intent的doRebind设置为true时，
+则调用service的onReBind方法。
+
+然而，这个Intent的doRebind在什么时候设置的为true呢？
+在service的unBind方法中。下面接着看。
+end note
+
+'看unBind的实现'
+other逻辑 -> ActiveServices : unbindServiceLocked
+
+ActiveServices -> ActiveServices : removeConnectionLocked
+note right
+当该IntentBindRecord中的apps.size() == 0时，
+即没有应用再通过该Intent绑定到该Service时，
+才会执行下面操作。注意此处，因为后面unbindFinishedLocked中
+end note
+
+ActiveServices -> IApplicationThread : scheduleUnbindService
+
+IApplicationThread -> ActivityThread : 经过Handler转换，调到handleUnbindService
+
+'private void handleUnbindService(BindServiceData data) {
+ '        Service s = mServices.get(data.token);
+ '        if (s != null) {
+ '            try {
+ '                data.intent.setExtrasClassLoader(s.getClassLoader());
+ '                data.intent.prepareToEnterProcess();
+ '                boolean doRebind = s.onUnbind(data.intent);
+ '                try {
+ '                    if (doRebind) {
+ '                        ActivityManager.getService().unbindFinished(
+ '                                data.token, data.intent, doRebind);
+ '                    } else {
+ '                        ActivityManager.getService().serviceDoneExecuting(
+ '                                data.token, SERVICE_DONE_EXECUTING_ANON, 0, 0);
+ '                    }
+ '                } catch (RemoteException ex) {
+ '                    throw ex.rethrowFromSystemServer();
+ '                }
+ '            } catch (Exception e) {
+ '                if (!mInstrumentation.onException(s, e)) {
+ '                    throw new RuntimeException(
+ '                            "Unable to unbind to service " + s
+ '                            + " with " + data.intent + ": " + e.toString(), e);
+ '                }
+ '            }
+ '        }
+ '    }'
+
+ActivityThread -> Service : onUnbind
+note right: 默认实现为false，可以重写;此处需要为true。
+
+Service --> ActivityThread : boolean doRebind
+
+ActivityThread -> IActivityManager : unbindFinished
+
+IActivityManager -> AMS : unbindFinished
+
+AMS -> ActiveServices : unbindFinishedLocked
+
+note left
+b.apps.size() == 0,所以，直接b.doRebind = true;
+这样呢,还有客户端使用该Intent绑定到该Service时,
+该Service就会收到onRebind回调.
+end note
+
+
+
+
+
+@enduml
