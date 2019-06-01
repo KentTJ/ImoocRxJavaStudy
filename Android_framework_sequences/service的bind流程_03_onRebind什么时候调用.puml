@@ -92,8 +92,4 @@ b.apps.size() == 0,所以，直接b.doRebind = true;
 该Service就会收到onRebind回调.
 end note
 
-
-
-
-
 @enduml
