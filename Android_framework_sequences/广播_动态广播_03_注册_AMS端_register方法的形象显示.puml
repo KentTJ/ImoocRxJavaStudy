@@ -1,5 +1,25 @@
 @startuml
 
+'添加进去的主要代码：
+ '1.ReceiverList rl = mRegisteredReceivers.get(receiver.asBinder());
+ 'ReceiverList类的定义如下,
+ '"final class ReceiverList extends ArrayList<BroadcastFilter>"
+ '里面的数据类型BroadcastFilter，定义如下，
+ '"final class BroadcastFilter extends IntentFilter",
+ '即BroadcastFilter 就是 IntentFilter。
+ '
+ 'mRegisteredReceivers
+ 'key为 IIntentReceiver对应的Binder，
+ 'value为 对应的ReceiverList。
+ '
+ '2.rl.app.receivers.add(rl);
+ '
+ '3.mRegisteredReceivers.put(receiver.asBinder(), rl);
+ '
+ '4.BroadcastFilter bf = new BroadcastFilter(filter, rl, callerPackage,
+ '                      permission, callingUid, userId, instantApp, visibleToInstantApps);
+ '5.mReceiverResolver.addFilter(bf);'
+
 class AMS{
 {field} HashMap<IBinder, ReceiverList> mRegisteredReceivers
 {field} IntentResolver<BroadcastFilter, BroadcastFilter> mReceiverResolver
@@ -55,27 +75,5 @@ match against actions, categories, and data (either via its type, scheme,
 and/or path) in an Intent.  It also includes a "priority" value which is
 used to order multiple matching filters.
 end note
-
-
-
-'添加进去的主要代码：
- '1.ReceiverList rl = mRegisteredReceivers.get(receiver.asBinder());
- 'ReceiverList类的定义如下,
- '"final class ReceiverList extends ArrayList<BroadcastFilter>"
- '里面的数据类型BroadcastFilter，定义如下，
- '"final class BroadcastFilter extends IntentFilter",
- '即BroadcastFilter 就是 IntentFilter。
- '
- 'mRegisteredReceivers
- 'key为 IIntentReceiver对应的Binder，
- 'value为 对应的ReceiverList。
- '
- '2.rl.app.receivers.add(rl);
- '
- '3.mRegisteredReceivers.put(receiver.asBinder(), rl);
- '
- '4.BroadcastFilter bf = new BroadcastFilter(filter, rl, callerPackage,
- '                      permission, callingUid, userId, instantApp, visibleToInstantApps);
- '5.mReceiverResolver.addFilter(bf);'
 
 @enduml
