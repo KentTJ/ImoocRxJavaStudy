@@ -8,9 +8,27 @@ note bottom of AMS
 属性 mRegisteredReceivers：
 Keeps track of all IIntentReceivers that have been registered for broadcasts.
 Hash keys are the receiver IBinder, hash value is a ReceiverList.
+
+即：
+一个客户端的IIntentReceiver转换的Binder对象，拥有一个
+IntentFilter的列表。
+这是可以想象到的，即一个Context和BroadcastReceiver的二元组，
+唯一确定一个IIntentReceiver，而这个二元组是可以添加多个
+IntentFilter的哈。
 end note
 
 IIntentReceiver "1" -- "1" ReceiverList : one have one
+note bottom of ReceiverList
+类头的注释：
+A receiver object that has registered for one or more broadcasts.
+The ArrayList holds BroadcastFilter objects.
+
+即：
+一个IIntentReceiver对应的BroadcasrReceiver，
+可以注册一个或多个广播，亦即会有一个或多个广播的intentFilter,
+此列表即为存储它们而用。
+end note
+
 class IIntentReceiver{
    IBinder asBinder()
 }
