@@ -25,8 +25,8 @@ class AMS{
 {field} IntentResolver<BroadcastFilter, BroadcastFilter> mReceiverResolver
 }
 note right of AMS
-属性 mReceiverResolver 的作用，
-后面梳理到再分析。
+属性 mReceiverResolver,即IntentResolver，
+用来解析Intent的，看它是否匹配。
 end note
 
 note bottom of AMS
