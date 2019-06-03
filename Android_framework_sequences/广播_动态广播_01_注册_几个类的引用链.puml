@@ -1,0 +1,21 @@
+@startuml
+title 动态广播的几个类的引用链
+class AMS
+
+AMS --> IIntentReceiver  : 引用
+
+
+IIntentReceiver --> ReceiverDispatcher : 引用(弱引用)
+note left of IIntentReceiver
+IIntentReceiver是一个
+aidl文件，其对应一个Binder，
+可以跨进程传递，
+实际上，传递使用的，
+是它的实现类
+InnerReceiver
+end note
+
+ReceiverDispatcher --> BroadcastReceiver : 引用
+
+
+@enduml

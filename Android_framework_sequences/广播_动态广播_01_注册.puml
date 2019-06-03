@@ -1,0 +1,16 @@
+@startuml
+title 动态广播的注册流程
+Activity -> ContextImpl : registerReceiver
+note right:参数(BroadcastReceiver receiver, IntentFilter filter)
+
+ContextImpl ->  ContextImpl : registerReceiver
+note right
+参数：
+(BroadcastReceiver receiver, IntentFilter filter,
+         String broadcastPermission, Handler scheduler)
+end note
+ContextImpl ->  ContextImpl : registerReceiverInternal
+
+
+
+@enduml
