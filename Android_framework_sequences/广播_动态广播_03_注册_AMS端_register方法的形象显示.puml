@@ -2,7 +2,12 @@
 
 class AMS{
 {field} HashMap<IBinder, ReceiverList> mRegisteredReceivers
+{field} IntentResolver<BroadcastFilter, BroadcastFilter> mReceiverResolver
 }
+note right of AMS
+mReceiverResolver 的作用，
+后面梳理到再分析。
+end note
 
 note bottom of AMS
 属性 mRegisteredReceivers：
