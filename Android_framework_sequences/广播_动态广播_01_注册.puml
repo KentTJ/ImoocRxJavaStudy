@@ -11,6 +11,25 @@ note right
 end note
 ContextImpl ->  ContextImpl : registerReceiverInternal
 
+ContextImpl -> LoadedApk : getReceiverDispatcher
+note right
+rd = new ReceiverDispatcher(r, context, handler,
+                        instrumentation, registered);
+可以看出，(BroadcastReceiver receiver, Context context),
+对应了一个二元组，这个二元组对应一个ReceiverDispatcher，
+即一个IIntentReceiver，AMS通过该IIntentReceiver与客户端交互。
+end note
+
+LoadedApk -> ReceiverDispatcher : getIIntentReceiver
+
+LoadedApk <-- ReceiverDispatcher : InnerReceiver mIIntentReceiver
+
+ContextImpl <-- LoadedApk : rd = IIntentReceiver
+
+ContextImpl -> IActivityManager : registerReceiver(..,rd,..)
+
+IActivityManager -> AMS : registerReceiver
+
 
 
 @enduml
