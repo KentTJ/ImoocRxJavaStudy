@@ -1,0 +1,97 @@
+@startuml
+title 发送广播的过程
+Activity -> ContextImpl : sendBroadcast
+
+ContextImpl -> IActivityManager : broadcastIntent
+
+IActivityManager -> AMS : broadcastIntent
+
+AMS -> AMS : broadcastIntentLocked
+
+AMS -> IntentResolver : queryIntent(intent,...)
+note right
+根据intent，查询已经注册
+且匹配的BroadcastFilter.
+end note
+
+AMS <-- IntentResolver : List<BroadcastFilter> registeredReceivers
+note left
+ordered表示是否有序。
+对于动态广播，它默认是无序的。
+所以，!ordered为true.
+end note
+
+AMS -> AMS : broadcastQueueForIntent
+
+AMS --> AMS : BroadcastQueue
+note right
+我们使用了两个BroadcastQueue，
+一个处理紧急任务的队列，
+一个处理普通任务的队列。
+
+我们使用的是普通任务的queue。
+end note
+
+AMS -> BroadcastRecord : BroadcastRecord(..,registeredReceivers,..)
+note right
+注意，BroadcastRecord中包含
+receiver列表.
+end note
+AMS <-- BroadcastRecord : BroadcastRecord r
+
+AMS -> BroadcastQueue : enqueueParallelBroadcastLocked(r)
+note right
+BroadcastQueue
+里面有两个列表，
+一个是并行列表，一个是
+串行列表(有序列表)。
+(即，一个并行分发，一个串行分发。)
+而动态广播入队无序队列。
+end note
+
+AMS -> BroadcastQueue : scheduleBroadcastsLocked
+
+BroadcastQueue -> BroadcastHandler : sendMessage(id BROADCAST_INTENT_MSG)
+
+BroadcastHandler -> BroadcastHandler : handleMessage(id BROADCAST_INTENT_MSG)
+
+BroadcastHandler -> BroadcastQueue : processNextBroadcast
+
+BroadcastQueue -> BroadcastQueue : processNextBroadcastLocked
+
+'code in processNextBroadcastLocked'
+' 动态广播的分发代码如下
+ ' // First, deliver any non-serialized broadcasts right away.
+ '        while (mParallelBroadcasts.size() > 0) {
+ '            r = mParallelBroadcasts.remove(0);
+ '            r.dispatchTime = SystemClock.uptimeMillis();
+ '            r.dispatchClockTime = System.currentTimeMillis();
+ '
+ '            final int N = r.receivers.size();
+ '            if (DEBUG_BROADCAST_LIGHT) Slog.v(TAG_BROADCAST, "Processing parallel broadcast ["
+ '                    + mQueueName + "] " + r);
+ '            for (int i=0; i<N; i++) {
+ '                Object target = r.receivers.get(i);
+ '                if (DEBUG_BROADCAST)  Slog.v(TAG_BROADCAST,
+ '                        "Delivering non-ordered on [" + mQueueName + "] to registered "
+ '                        + target + ": " + r);
+ '                deliverToRegisteredReceiverLocked(r, (BroadcastFilter)target, false, i);
+ '            }
+ '            addBroadcastToHistoryLocked(r);
+ '        }'
+BroadcastQueue -> BroadcastQueue : deliverToRegisteredReceiverLocked
+note left
+代码逻辑：
+1. 获取并行列表表头的BroadcastRecord ;
+2. 获取该record中的receivers列表,
+对每一个BroadcastFilter都调用
+deliverToRegisteredReceiverLocked，进行分发。
+end note
+
+BroadcastQueue -> BroadcastQueue : performReceiveLocked
+note right
+下面会涉及到广播的接收原理。
+end note
+
+
+@enduml
