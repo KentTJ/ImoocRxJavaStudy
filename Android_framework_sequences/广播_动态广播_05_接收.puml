@@ -36,6 +36,29 @@ end note
  '    }'
 BroadcastQueue -> ApplicationThread : scheduleRegisteredReceiver
 
-ApplicationThread -> IIntentReceiver : performReceive
+ApplicationThread -> IIntentReceiver : InnerReceiver:performReceive
+
+InnerReceiver -> LoadedApk.ReceiverDispatcher : performReceive
+
+LoadedApk.ReceiverDispatcher -> ActivityThread.H : post(args.getRunnable())
+note right
+切换到主线程,如此，
+后面的BroadcastReceiver的onReceive方法即在主线程执行。
+end note
+
+ActivityThread.H -> Args.Runnable : run
+
+Args.Runnable -> BroadcastReceiver : onReceive
+
+BroadcastReceiver -> BroadcastReceiver.PendingResult : finish
+note right
+静态广播，TYPE_COMPONENT
+和带mOrderedHint的动态广播，
+
+在处理完之后，都需要告诉AMS已经处理完，
+调用AMS.finishReceiver方法。
+
+普通动态广播在finish方法中什么都没做。
+end note
 
 @enduml
