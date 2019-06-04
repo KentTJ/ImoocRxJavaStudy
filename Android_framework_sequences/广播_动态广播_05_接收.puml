@@ -13,6 +13,7 @@ receiver.performReceive。
 IApplicationThread的所有方法都是oneway的，
 AMS端调用IApplicationThread这个binder对象的的oneway方法
 的调用，在应用端都会自动串行化。
+即，在AMS端是并行分发的，在应用端是串行接收的。
 
 直接调IIntentReceiver的performReceive方法，也会在客户端串行化，
 但它只保证当前接口的调用串行化，AMS希望所有的广播在应用端都串行化分发，
