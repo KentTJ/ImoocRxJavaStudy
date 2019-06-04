@@ -1,0 +1,41 @@
+@startuml
+title 广播的接收
+BroadcastQueue -> BroadcastQueue : performReceiveLocked
+note right
+app.thread.scheduleRegisteredReceiver方法，在客户端执行如下代码：
+receiver.performReceive。
+然后就有疑问了，为什么不在AMS端直接调用receiver.performReceive方法呢，
+即跟else里面的代码一样？
+
+
+其实，它主要是想要应用进程里面的所有广播的分发都串行化。
+
+IApplicationThread的所有方法都是oneway的，
+AMS端调用IApplicationThread这个binder对象的的oneway方法
+的调用，在应用端都会自动串行化。
+
+直接调IIntentReceiver的performReceive方法，也会在客户端串行化，
+但它只保证当前接口的调用串行化，AMS希望所有的广播在应用端都串行化分发，
+所以走IApplicationThread的scheduleRegisteredReceiver方法。
+
+end note
+ 'void performReceiveLocked(ProcessRecord app, IIntentReceiver receiver,
+ '            Intent intent, int resultCode, String data, Bundle extras,
+ '            boolean ordered, boolean sticky, int sendingUser) throws RemoteException {
+ '        if (app != null) {
+ '            if (app.thread != null) {
+ '                try {
+ '                    app.thread.scheduleRegisteredReceiver(receiver, intent, resultCode,
+ '                            data, extras, ordered, sticky, sendingUser, app.repProcState);
+ '                } catch (RemoteException ex) {
+ '                }
+ '        } else {
+ '            receiver.performReceive(intent, resultCode, data, extras, ordered,
+ '                    sticky, sendingUser);
+ '        }
+ '    }'
+BroadcastQueue -> ApplicationThread : scheduleRegisteredReceiver
+
+ApplicationThread -> IIntentReceiver : performReceive
+
+@enduml
