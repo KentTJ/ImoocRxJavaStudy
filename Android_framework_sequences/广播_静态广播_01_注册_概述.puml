@@ -1,0 +1,35 @@
+@startuml
+title 静态广播的注册
+note
+1、静态广播，它是在Android的Manifest配置文件里注册的;
+
+2、Android在启动时，会去启动PackageManagerService服务，
+这个服务会去扫描已经安装的APK，解析里面的AndroidManifest文件，
+具体解析如下：
+PackageParser parseBaseApplication
+else if (tagName.equals("receiver")) {
+//注意，此处的Activity不是四大组件里面的Activity，
+//而是PackageParser的静态内部类，
+//定义如下：
+//public final static class Activity extends Component<ActivityIntentInfo> implements Parcelable。
+
+                Activity a = parseActivity(owner, res, parser, flags, outError, cachedArgs,
+                        true, false);
+                if (a == null) {
+                    mParseError = PackageManager.INSTALL_PARSE_FAILED_MANIFEST_MALFORMED;
+                    return false;
+                }
+
+                hasReceiverOrder |= (a.order != 0);
+                owner.receivers.add(a);
+
+            }
+
+解析完之后呢，咱们的静态广播就注册到PackageManagerService里面了。
+
+3、解析完之后，我们自定义的静态广播就注册到PMS里面了，需要的时候，直接从PMS中查就行。
+具体怎么查，此处略。
+
+end note
+
+@enduml
