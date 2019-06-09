@@ -112,7 +112,7 @@ end note
 
 BroadcastQueue -> BroadcastQueue : broadcastTimeoutLocked
 note right
-超时的情况代码处理：
+processNextBroadcastLocked方法内部：超时的情况代码处理：
 
 //找到当前分发的receiver对应的进程
 
@@ -143,5 +143,63 @@ BroadcastHandler -> AppNotResponding : run,方法中显示ANR对话框
 note right
 显示ANR对话框。
 end note
+
+'r.state != BroadcastRecord.IDLE 说明有receiver正在分发。
+
+'next，继续分发下一个receiver
+
+BroadcastQueue -> BroadcastRecord : r.receivers.get(recIdx)
+BroadcastQueue <-- BroadcastRecord : Object nextReceiver
+note right
+nextReceiver是BroadcastFilter类型，
+就说明该receiver是动态注册的。
+动态有序的。
+end note
+
+BroadcastQueue -> BroadcastQueue : deliverToRegisteredReceiverLocked
+
+BroadcastQueue -> BroadcastQueue : performReceiveLocked
+
+BroadcastQueue -> BroadcastRecord : BroadcastRecord的state 赋值为 BroadcastRecord.CALL_DONE_RECEIVE
+
+BroadcastQueue -> IApplicationThread : scheduleRegisteredReceiver
+note right
+此时转到客户端接收部分。
+此处的ordered为true
+end note
+
+IApplicationThread -> IIntentReceiver : InnerReceiver:performReceive
+
+IIntentReceiver -> ReceiverDispatcher : performReceive
+
+ReceiverDispatcher -> H : post(args.getRunnable())
+
+H -> Runnable : run
+
+Runnable -> BroadcastReceiver : setPendingResult(Args args)
+
+Runnable -> BroadcastReceiver : onReceive
+
+Runnable -> BroadcastReceiver.PendingResult : finish
+note right: mOrderedHint 为true
+
+BroadcastReceiver.PendingResult -> BroadcastReceiver.PendingResult : sendFinished
+
+BroadcastReceiver.PendingResult -> IActivityManager : finishReceiver
+
+IActivityManager -> AMS : finishReceiver
+
+AMS -> BroadcastQueue : finishReceiverLocked
+
+AMS <-- BroadcastQueue : doNext = true
+note left
+因为 deliverToRegisteredReceiverLocked方法中赋值
+的r.state == BroadcastRecord.CALL_DONE_RECEIVE。
+end note
+AMS -> BroadcastQueue : processNextBroadcastLocked
+note right
+继续分发下一个receiver。
+end note
+
 
 @enduml
