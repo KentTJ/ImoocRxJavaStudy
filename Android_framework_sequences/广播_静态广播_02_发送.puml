@@ -149,6 +149,8 @@ end note
 'next，继续分发下一个receiver
 
 BroadcastQueue -> BroadcastRecord : r.receivers.get(recIdx)
+
+'动态分发，begin
 BroadcastQueue <-- BroadcastRecord : Object nextReceiver
 note right
 nextReceiver是BroadcastFilter类型，
@@ -201,9 +203,59 @@ note left
 end note
 AMS -> BroadcastQueue : processNextBroadcastLocked
 note right
-继续将管广播分发到下一个receiver。
+继续将广播分发到下一个receiver。
+一次动态分发结束。
+end note
+
+'动态分发，end
+
+'静态分发，begin
+BroadcastQueue -> BroadcastQueue : processCurBroadcastLocked
+note right
+继续在processNextBroadcastLocked方法中，
+进行静态注册的receiver的分发。
+end note
+
+BroadcastQueue -> IApplicationThread : scheduleReceiver
+
+IApplicationThread -> ActivityThread : sendMessage(id H.RECEIVER)
+
+H -> ActivityThread : handleReceiver
+
+ActivityThread -> BroadcastReceiver : setPendingResult
+
+ActivityThread -> BroadcastReceiver : onReceive
+
+ActivityThread -> BroadcastReceiver.PendingResult : finish
+note right
+告诉AMS可以继续分发给下一个receiver了。
+end note
+BroadcastReceiver.PendingResult -> BroadcastReceiver.PendingResult : sendFinished
+
+BroadcastReceiver.PendingResult -> IActivityManager : finishReceiver
+
+IActivityManager -> AMS : finishReceiver(IBinder who,...)
+note right
+这个who，就是IIntentReceiver
+end note
+
+AMS -> BroadcastQueue : finishReceiverLocked
+
+AMS <-- BroadcastQueue : doNext = true
+note left
+因为分发静态receiver时，在
+processNextBroadcastLocked方法中将
+r.state 赋值为 BroadcastRecord.APP_RECEIVE。
+end note
+AMS -> BroadcastQueue : processNextBroadcastLocked
+note right
+继续将广播分发到下一个receiver。
+一次静态分发结束。
 end note
 
 
+
+
+'静态分发，end
 
 @enduml
