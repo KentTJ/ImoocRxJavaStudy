@@ -29,8 +29,10 @@ if (!ordered && NR > 0) {
 
 }
 
-3、没处理完的跟静态的合并一处
+3、没处理完的receiver跟静态的合并一处
 //给没有处理完的动态receiver，跟静态receiver合并到一起
+//为什么没有处理完呢，比如ordered == true，则2处的，动态的receiver
+//就不会处理，就会走到这里的代码，将其和静态的receiver合并在一起。
 
 
 4、处理剩下的receiver，串行处理
@@ -39,8 +41,8 @@ if ((receivers != null && receivers.size() > 0)
 //处理剩下的receiver，加到串行分发队列
 
 }
-
-
 end note
+
+
 
 @enduml
