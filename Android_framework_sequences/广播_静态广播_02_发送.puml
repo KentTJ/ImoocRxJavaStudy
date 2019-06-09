@@ -1,0 +1,14 @@
+@startuml
+title 静态广播的发送(这只讨论普通广播，不是ordered广播或Sticky广播)
+
+Activity -> ContextImpl : sendBroadcast
+
+ContextImpl -> IActivityManager : broadcastIntent
+
+IActivityManager -> AMS : broadcastIntent
+
+AMS -> AMS : broadcastIntentLocked
+
+
+
+@enduml
