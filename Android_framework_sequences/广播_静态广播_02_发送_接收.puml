@@ -225,6 +225,10 @@ H -> ActivityThread : handleReceiver
 ActivityThread -> BroadcastReceiver : setPendingResult
 
 ActivityThread -> BroadcastReceiver : onReceive
+note right
+onReceive(Context context,..),
+这个Context，是以Application为mBase的ContextWrapper。
+end note
 
 ActivityThread -> BroadcastReceiver.PendingResult : finish
 note right
@@ -266,6 +270,10 @@ AMS -> AMS : attachApplicationLocked
 AMS -> AMS : sendPendingBroadcastsLocked
 AMS -> BroadcastQueue : sendPendingBroadcastsLocked
 BroadcastQueue -> BroadcastQueue : processCurBroadcastLocked
+note right
+app.thread.scheduleReceiver,
+详见上文。
+end note
 '静态分发，进程不在，end
 
 @enduml
