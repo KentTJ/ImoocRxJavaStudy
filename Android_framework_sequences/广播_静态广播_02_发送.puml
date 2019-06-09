@@ -82,6 +82,22 @@ end note
 BroadcastHandler -> BroadcastQueue : processNextBroadcast
 
 BroadcastQueue -> BroadcastQueue : processNextBroadcastLocked
+note right
+BroadcastQueue 中 processNextBroadcastLocked的处理流程
+
+//先给并行分发的广播分发完，然后接下来分发串行广播
+
+//如果有pending的广播，就先直接返回，这个广播在等待应用进程启动
+
+//如果当前广播分发超时了，就废弃这个广播，处理下一个广播
+//如果没有超时，并且正在分发中，就先返回，什么也不做
+//如果当前广播已经分发完一个receiver了，就继续分发下一个receiver
+//如果这个receiver是动态注册的receiver，就直接分发
+//如果这个receiver是静态注册的receiver，就先看进程启动没有
+//如果进程启动了，就直接分发
+//没启动的话就先启动进程，然后给广播标记为pending
+//进程启动后attachApplication时，继续处理这个pending的广播
+end note
 
 
 
