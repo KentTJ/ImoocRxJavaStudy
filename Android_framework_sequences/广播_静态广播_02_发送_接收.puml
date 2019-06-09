@@ -209,7 +209,7 @@ end note
 
 '动态分发，end
 
-'静态分发，begin
+'静态分发，进程已在，begin
 BroadcastQueue -> BroadcastQueue : processCurBroadcastLocked
 note right
 继续在processNextBroadcastLocked方法中，
@@ -253,9 +253,19 @@ note right
 一次静态分发结束。
 end note
 
+'静态分发，进程已在，end
 
+'静态分发，进程不在，begin
+BroadcastQueue -> BroadcastQueue : processNextBroadcastLocked
+'startProcessLocked()
+'mPendingBroadcast = r;
+'mPendingBroadcastRecvIndex = recIdx;
 
-
-'静态分发，end
+ActivityThread -> AMS : attachApplication
+AMS -> AMS : attachApplicationLocked
+AMS -> AMS : sendPendingBroadcastsLocked
+AMS -> BroadcastQueue : sendPendingBroadcastsLocked
+BroadcastQueue -> BroadcastQueue : processCurBroadcastLocked
+'静态分发，进程不在，end
 
 @enduml
