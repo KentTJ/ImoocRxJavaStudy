@@ -41,7 +41,47 @@ if ((receivers != null && receivers.size() > 0)
 //处理剩下的receiver，加到串行分发队列
 
 }
+
+注: 因为动态广播的发送部分，已经讲解过 动态广播的分发部分，现在主要讲解
+静态广播的串行处理部分。
 end note
+'if ((receivers != null && receivers.size() > 0)
+ '                || resultTo != null) {
+ '            BroadcastQueue queue = broadcastQueueForIntent(intent);
+ '            BroadcastRecord r = new BroadcastRecord(queue, intent, callerApp,
+ '                    callerPackage, callingPid, callingUid, callerInstantApp, resolvedType,
+ '                    requiredPermissions, appOp, brOptions, receivers, resultTo, resultCode,
+ '                    resultData, resultExtras, ordered, sticky, false, userId);
+ '                queue.enqueueOrderedBroadcastLocked(r);
+ '                queue.scheduleBroadcastsLocked();
+ '}
+
+AMS -> AMS : broadcastQueueForIntent
+AMS <-- AMS : BroadcastQueue mBgBroadcastQueue
+
+AMS -> BroadcastRecord : BroadcastRecord
+AMS <-- BroadcastRecord : BroadcastRecord r
+
+AMS -> BroadcastQueue : enqueueOrderedBroadcastLocked(r)
+
+BroadcastQueue -> ArrayList : mOrderedBroadcasts.add(r)
+
+AMS -> BroadcastQueue : scheduleBroadcastsLocked
+
+BroadcastQueue -> BroadcastHandler : sendMessage(id BROADCAST_INTENT_MSG)
+
+BroadcastQueue -> BroadcastHandler : handleMessage
+note right
+ServiceThread线程中处理的，对应AMS中代码如下：
+mHandlerThread = new ServiceThread(TAG,
+      THREAD_PRIORITY_FOREGROUND, false /*allowIo*/);
+mHandlerThread.start();
+mHandler = new MainHandler(mHandlerThread.getLooper());
+end note
+
+BroadcastHandler -> BroadcastQueue : processNextBroadcast
+
+BroadcastQueue -> BroadcastQueue : processNextBroadcastLocked
 
 
 
