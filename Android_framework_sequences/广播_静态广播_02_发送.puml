@@ -8,7 +8,39 @@ ContextImpl -> IActivityManager : broadcastIntent
 IActivityManager -> AMS : broadcastIntent
 
 AMS -> AMS : broadcastIntentLocked
+note right
+broadcastIntentLocked 方法的主要流程：
+
+1、查询静态和动态注册的receiver
+// Figure out who all will receive this broadcast.
+List receivers = null;
+List<BroadcastFilter> registeredReceivers = null;
+//查询静态注册的Receiver
+receivers = collectReceiverComponents(intent, resolvedType, callingUid, users);
+//通过mReceiverResolver去找动态注册的Receiver
+registeredReceivers = mReceiverResolver.queryIntent(intent,
+                        resolvedType, false /*defaultOnly*/, userId);
 
 
+2、处理动态的receiver，并行处理
+int NR = registeredReceivers != null ? registeredReceivers.size() : 0;
+if (!ordered && NR > 0) {
+//处理动态的receiver，加到并行分发队列
+
+}
+
+3、没处理完的跟静态的合并一处
+//给没有处理完的动态receiver，跟静态receiver合并到一起
+
+
+4、处理剩下的receiver，串行处理
+if ((receivers != null && receivers.size() > 0)
+                || resultTo != null) {
+//处理剩下的receiver，加到串行分发队列
+
+}
+
+
+end note
 
 @enduml
