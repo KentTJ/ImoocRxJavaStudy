@@ -187,7 +187,10 @@ BroadcastReceiver.PendingResult -> BroadcastReceiver.PendingResult : sendFinishe
 
 BroadcastReceiver.PendingResult -> IActivityManager : finishReceiver
 
-IActivityManager -> AMS : finishReceiver
+IActivityManager -> AMS : finishReceiver(IBinder who,...)
+note right
+这个who，就是IIntentReceiver
+end note
 
 AMS -> BroadcastQueue : finishReceiverLocked
 
@@ -198,8 +201,9 @@ note left
 end note
 AMS -> BroadcastQueue : processNextBroadcastLocked
 note right
-继续分发下一个receiver。
+继续将管广播分发到下一个receiver。
 end note
+
 
 
 @enduml
