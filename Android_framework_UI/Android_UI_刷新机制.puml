@@ -1,0 +1,43 @@
+@startuml
+title Choreographer（舞蹈指导）-屏幕绘制指挥者
+
+Choreographer -> UI绘制
+note left
+Choreographer（舞蹈指导），它有什么用呢？
+就是说，你往Choreographer厘面发一个消息，这个
+消息最快也要等下一个vsync信号到来才能触发。
+
+我们的绘制是随时发起的，当我们封装一个Runnable丢给
+Choreographer，下一个vsync信号来的时候，就会开始处理
+消息，就会真正的开始界面的重绘了。
+
+即：UI绘制的节奏，
+完全由Choreographer来控制。
+
+接下来的内容会介绍 Choreographer 底层实现的原理。
+end note
+
+
+ViewRootImpl -> ViewRootImpl:requestLayout
+note right
+该函数用来发起UI重绘的。
+end note
+
+ViewRootImpl -> ViewRootImpl:scheduleTraversals
+note right
+主要干了两件事：
+1、往线程消息字队列添加了一个SyncBarrier;
+2、往mChoreographer的消息队列里面添加了一个postCallback;
+...
+end note
+
+
+
+
+/'Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response'/
+
+@enduml
