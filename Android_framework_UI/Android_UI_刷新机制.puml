@@ -1,7 +1,7 @@
 @startuml
 title Choreographer（舞蹈指导）-屏幕绘制指挥者
 
-Choreographer -> UI绘制
+/'Choreographer -> UI绘制
 note left
 Choreographer（舞蹈指导），它有什么用呢？
 就是说，你往Choreographer厘面发一个消息，这个
@@ -15,29 +15,44 @@ Choreographer，下一个vsync信号来的时候，就会开始处理
 完全由Choreographer来控制。
 
 接下来的内容会介绍 Choreographer 底层实现的原理。
-end note
+end note'/
 
+
+ViewRootImpl -> ViewRootImpl: ViewRootImpl构造
+ViewRootImpl -> Choreographer: getInstance
+Choreographer -> ThreadLocal: get
+ThreadLocal --> Choreographer: Choreographer实例
+Choreographer --> ViewRootImpl: 存入mChoreographer
 
 ViewRootImpl -> ViewRootImpl:requestLayout
-note right
-该函数用来发起UI重绘的。
+note left
+requestLayout 该函数用来发起UI重绘的。
 end note
 
 ViewRootImpl -> ViewRootImpl:scheduleTraversals
-note right
-主要干了两件事：
+note left
+scheduleTraversals 主要干了两件事：
 1、往线程消息字队列添加了一个SyncBarrier;
 2、往mChoreographer的消息队列里面添加了一个postCallback;
-...
+注：
+1、这个SyncBarrier其实就是一个屏障。把这个屏障插到消息队列里面之后呢，
+这个屏障之后的普通消息就不能处理了;得等到这个屏障撤除了之后才能处理。
+但是这个屏障对异步消息是没有影响的。
+
+为什么要有这么一个机制呢？
+主要是因为有些类型的消息比较紧急，是需要马上处理的。
+如果消息队列里面普通消息太多的话，比较耽误事，所以插了一个屏障，把一般的
+普通消息先挡到一边，优先处理异步消息。比如我们下面放到mChoreographer的
+消息队列里的mTraversalRunnable就是异步消息。
+等到下一次的vsync信号来的时候，这个异步消息是要紧急处理的。
+
+2、我们来看这个mChoreographer。
+它是在ViewRootImpl构造时被初始化的，Choreographer.getInstance()。
+
+
+
 end note
 
 
-
-
-/'Alice -> Bob: Authentication Request
-Bob --> Alice: Authentication Response
-
-Alice -> Bob: Another authentication Request
-Alice <-- Bob: another authentication Response'/
 
 @enduml
