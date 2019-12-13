@@ -1,0 +1,132 @@
+@startuml
+title Choreographer（舞蹈指导）-屏幕绘制指挥者
+
+/'Choreographer -> UI绘制
+note left
+Choreographer（舞蹈指导），它有什么用呢？
+就是说，你往Choreographer厘面发一个消息，这个
+消息最快也要等下一个vsync信号到来才能触发。
+
+我们的绘制是随时发起的，当我们封装一个Runnable丢给
+Choreographer，下一个vsync信号来的时候，就会开始处理
+消息，就会真正的开始界面的重绘了。
+
+即：UI绘制的节奏，
+完全由Choreographer来控制。
+
+接下来的内容会介绍 Choreographer 底层实现的原理。
+end note'/
+
+
+ViewRootImpl -> ViewRootImpl: ViewRootImpl构造
+ViewRootImpl -> Choreographer: getInstance
+Choreographer -> ThreadLocal: get
+ThreadLocal --> Choreographer: Choreographer实例
+Choreographer --> ViewRootImpl: 存入mChoreographer
+
+请求UI更新 -> ViewRootImpl:requestLayout
+note left
+requestLayout 该函数用来发起UI重绘的。
+end note
+
+ViewRootImpl -> ViewRootImpl:scheduleTraversals
+note left
+scheduleTraversals 主要干了两件事：
+1、往线程消息字队列添加了一个SyncBarrier;
+2、往mChoreographer的消息队列里面添加了一个postCallback;
+注：
+1、这个SyncBarrier其实就是一个屏障。把这个屏障插到消息队列里面之后呢，
+这个屏障之后的普通消息就不能处理了;得等到这个屏障撤除了之后才能处理。
+但是这个屏障对异步消息是没有影响的。
+
+为什么要有这么一个机制呢？
+主要是因为有些类型的消息比较紧急，是需要马上处理的。
+如果消息队列里面普通消息太多的话，比较耽误事，所以插了一个屏障，把一般的
+普通消息先挡到一边，优先处理异步消息。比如我们下面放到mChoreographer的
+消息队列里的mTraversalRunnable就是异步消息。
+等到下一次的vsync信号来的时候，这个异步消息是要紧急处理的。
+
+2、我们来看这个mChoreographer。
+它是在ViewRootImpl构造时被初始化的，Choreographer.getInstance()。
+getInstance函数实现：sThreadInstance.get()。
+其中sThreadInstance是ThreadLocal。也就是说，在不同的线程调用getInstance方法，
+得到的是不同的Choreographer。
+
+end note
+note right
+scheduleTraversals方法体中，
+1、在mTraversalScheduled的值为false时才会执行里面更新界面的具体方法题，
+执行之后又将mTraversalScheduled的值设置为true，这样，在一个vsync信号
+周期内只更新一次界面的操作;在执行doTraversal的时候，执行之后又将mTraversalScheduled的值设置为false，
+如此下次vsync信号来时又可以正常更新界面。
+
+即在一个vsync信号周期里面，只有一次requestLayout有效。
+只会触发一次界面重绘。
+end note
+ViewRootImpl -> ViewRootHandler : getLooper()
+ViewRootHandler -> Looper : getQueue
+Looper -> MessageQueue : postSyncBarrier
+
+
+ViewRootImpl -> Choreographer : postCallback(., Runnable action,.)
+Choreographer -> Choreographer : postCallbackDelayed
+Choreographer -> Choreographer : postCallbackDelayedInternal
+Choreographer -> Choreographer : scheduleFrameLocked
+
+Choreographer -> Choreographer : scheduleVsyncLocked
+note right
+scheduleVsyncLocked该方法需要在
+Choreographer的执行线程中执行。
+所以在scheduleFrameLocked中
+调用scheduleVsyncLocked时，
+有判断线程和线程切换的消息，而且该消息是异步消息，
+即不受屏障的影响，同时，该消息插在消息队列头，可见这个消息
+是非常非常紧急的。
+end note
+
+Choreographer -> FrameDisplayEventReceiver : scheduleVsync
+FrameDisplayEventReceiver -> FrameDisplayEventReceiver : nativeScheduleVsync
+note right
+进入native层，调用相应代码。
+做完了会发生什么呢？
+其实，这些代码就会告诉SurfaceFlinger，
+这边会关注下一个Vsync信号。
+所以呢，当下一个vsync信号到来的时候，就会回调
+FrameDisplayEventReceiver这个类的onVsync这个函数。
+end note
+
+SurfaceFlinger -> FrameDisplayEventReceiver : onVsync
+note right
+下一个vsync信号到来时，SurfaceFlinger会通知我们，之后会回调到
+FrameDisplayEventReceiver的onVsync函数。
+onVsync(long timestampNanos,.,.)，其中timestampNanos变量就是此次
+vsync的时间戳。
+end note
+
+FrameDisplayEventReceiver -> FrameHandler : sendMessageAtTime
+note right
+这里又封装一个消息发出去，是干什么的呢？
+因为onVsync回调就是在Choreographer的工作线程，FrameHandler也是在
+Choreographer的工作线程，重点是该消息的时间戳。
+注意：
+1、发送的消息是异步的，不受屏障的影响;
+2、Message的Callback即为FrameDisplayEventReceiver，
+因为它实现了Runnable接口;
+3、该消息是带时间戳的，表示该消息触发的时间。
+有了这个时间戳，就可以按照时间戳的顺序来处理消息。
+end note
+
+'到时间之后，就会调用消息里面的回调的run方法。
+FrameHandler -> FrameHandler : enqueueMessage
+FrameHandler -> MessageQueue : enqueueMessage
+
+Looper -> FrameDisplayEventReceiver : run
+note left
+当到达触发该消息的时间时，
+会回调该消息的Callback的run方法
+end note
+
+FrameDisplayEventReceiver -> Choreographer : doFrame
+
+
+@enduml
